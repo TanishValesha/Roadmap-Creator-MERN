@@ -18,6 +18,7 @@ import { FaRegSave } from "react-icons/fa";
 import { FaFileExport } from "react-icons/fa6";
 import { BiImport } from "react-icons/bi";
 import toast from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
 
 const initialNodes = [
   {
@@ -43,6 +44,8 @@ const DnDFlow = () => {
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+
+  const [saved, setSaved] = useState(false);
 
   const onNodeClick = (e, node) => {
     setEditValue(node.data.label);
@@ -129,20 +132,18 @@ const DnDFlow = () => {
       if (!type) {
         return;
       }
-
-      // project was renamed to screenToFlowPosition
-      // and you don't need to subtract the reactFlowBounds.left/top anymore
-      // details: https://reactflow.dev/whats-new/2023-11-10
       const position = screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
       const newNode = {
-        id: getId(),
+        id: getId() + uuidv4(),
         type,
         position,
         data: { label: `${type} node` },
       };
+      console.log(newNode);
+      console.log("Set Node");
 
       setNodes((nds) => nds.concat(newNode));
     },
@@ -188,7 +189,6 @@ const DnDFlow = () => {
           const jsonChartData = JSON.parse(fileContents); // Parse the JSON content// Optional: Log the data
           setNodes(jsonChartData["nodeData"]);
           setEdges(jsonChartData["edgeData"]);
-          console.log(jsonChartData[1]);
 
           // onNodesChange(jsonChartData.item);
         } catch (error) {
@@ -200,7 +200,21 @@ const DnDFlow = () => {
     }
   };
 
+  // const handleSaveState = () => {
+  //   const localNodes = localStorage.getItem("nodes");
+  //   const localEdges = localStorage.getItem("edges");
+  //   console.log("Running");
+
+  //   if (localEdges == edges && localNodes == nodes) {
+  //     setSaved(true);
+  //   } else {
+  //     setSaved(false);
+  //   }
+  // };
+
   useEffect(() => {
+    console.log("Triggering Effect");
+
     const savedNodes = localStorage.getItem("nodes");
     const savedEdges = localStorage.getItem("edges");
     if (savedNodes) {
@@ -254,6 +268,13 @@ const DnDFlow = () => {
                 className="bg-white text-black gap-2 hover:bg-white shadow"
                 onClick={handleTempSave}
               >
+                <div
+                  className={
+                    saved == true
+                      ? "w-2 h-2 bg-black hidden rounded-full"
+                      : "w-2 h-2 bg-black block rounded-full"
+                  }
+                ></div>
                 <FaRegSave className="text-xl" />
                 Save
               </Button>
