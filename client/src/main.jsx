@@ -10,7 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 createRoot(document.getElementById("root")).render(
   <div className="main-app">
     <BrowserRouter>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="bottom-center" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />

@@ -12,6 +12,7 @@ app.use(express.json());
 app.use(morgan("tiny"));
 
 app.use("/api/user", userRouter);
+app.use("/api/chart", chartRouter);
 
 try {
   mongoose.connect(process.env.MONGODB_CONNECTION_STRING).then(() => {

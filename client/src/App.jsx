@@ -9,16 +9,33 @@ import {
   useReactFlow,
   Background,
 } from "@xyflow/react";
+import {
+  Dialog,
+  DialogContent,
+  DialogClose,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import Sidebar from "./Sidebar";
 import { DnDProvider, useDnD } from "./DnDContext";
 import "./index.css";
 import { FaRegSave } from "react-icons/fa";
+import { FaDatabase } from "react-icons/fa";
 import { FaFileExport } from "react-icons/fa6";
-import { BiImport } from "react-icons/bi";
+import { IoMdDownload } from "react-icons/io";
+import { IoReload } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import { baseURL } from "./utils/constants";
 
 const initialNodes = [
   {
@@ -46,6 +63,12 @@ const DnDFlow = () => {
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
 
   const [saved, setSaved] = useState(false);
+
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const [roadmapName, setRoadmapName] = useState("");
+
+  const [dbGraphs, setDbgraphs] = useState([]);
 
   const onNodeClick = (e, node) => {
     setEditValue(node.data.label);
@@ -156,8 +179,6 @@ const DnDFlow = () => {
     toast.success("Saved!");
   };
 
-  const getDataOnReload = () => {};
-
   const handleSave = () => {
     const nodeData = nodes;
     const edgeData = edges;
@@ -174,6 +195,31 @@ const DnDFlow = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+  const handleDBSave = async (e) => {
+    const nodeData = nodes;
+    const edgeData = edges;
+    const fileData = { nodeData, edgeData };
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.post(
+        `${baseURL}/api/chart/save`,
+        { data: fileData, title: roadmapName, userId: currentUser.id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response);
+      if (response.status == 201) {
+        toast.success("Saved in DB, Hit Reload");
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      toast.error("Unable to save");
+    }
   };
 
   const handleImport = (event) => {
@@ -200,6 +246,50 @@ const DnDFlow = () => {
     }
   };
 
+  const handleDownload = async (graphId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(
+        `${baseURL}/api/chart/graphs-db/import/${graphId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data[0].data.nodeData);
+      setNodes(response.data[0].data.nodeData);
+      setEdges(response.data[0].data.edgeData);
+      toast.success("Imported Succesfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Can't Load from DB");
+    }
+  };
+
+  const handleDelete = async (graphId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.delete(
+        `${baseURL}/api/chart/graphs-db/delete/${graphId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status == 201) {
+        toast.success("Deleted Successfully, Hit Refresh");
+      } else {
+        console.log(error);
+        toast.error("Can't Delete from DB");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Can't Delete from DB");
+    }
+  };
+
   // const handleSaveState = () => {
   //   const localNodes = localStorage.getItem("nodes");
   //   const localEdges = localStorage.getItem("edges");
@@ -212,9 +302,37 @@ const DnDFlow = () => {
   //   }
   // };
 
-  useEffect(() => {
-    console.log("Triggering Effect");
+  const getCurrentUser = async () => {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`${baseURL}/api/user/current-user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setCurrentUser(response.data.data);
+    return response.data.data;
+  };
 
+  const getDBgraphs = async (userId) => {
+    const token = localStorage.getItem("token");
+    console.log(currentUser);
+    try {
+      const response = await axios.get(
+        `${baseURL}/api/chart/graphs-db/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setDbgraphs(response.data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Can't Load from DB");
+    }
+  };
+
+  useEffect(() => {
     const savedNodes = localStorage.getItem("nodes");
     const savedEdges = localStorage.getItem("edges");
     if (savedNodes) {
@@ -226,9 +344,19 @@ const DnDFlow = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        await getDBgraphs(user.id);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="dndflow">
-      <div className="flex flex-col items-start bg-blue-500 w-[20%] p-6 gap-4 shadow-lg">
+      <div className="flex flex-col items-start bg-blue-500 w-[20%] h-[50%] p-6 gap-4 shadow-lg">
         <label className="text-2xl text-white ">Label: </label>
         <input
           type="text"
@@ -242,6 +370,57 @@ const DnDFlow = () => {
         >
           Update label
         </button>
+      </div>
+      <div className="absolute bottom-0 w-[20%] h-[50%]">
+        <Tabs defaultValue="account" className="w-[100%]">
+          <TabsList className="w-[100%] flex justify-evenly">
+            <TabsTrigger value="private">Private</TabsTrigger>
+            <TabsTrigger value="public">Public</TabsTrigger>
+          </TabsList>
+          <TabsContent value="private" className="h-[100%] outline-none">
+            <ScrollArea className="rounded-md border">
+              <div className="p-3 flex flex-col">
+                <div className="flex justify-between">
+                  <h4 className="mb-4 text-lg font-medium leading-none">
+                    Previously Saved Roadmaps
+                  </h4>
+                  <IoReload
+                    className="text-xl text-yellow-500 cursor-pointer"
+                    onClick={async () => {
+                      const user = await getCurrentUser();
+                      if (user) {
+                        await getDBgraphs(user.id);
+                      }
+                    }}
+                  />
+                </div>
+                {dbGraphs.map((graph) => (
+                  <div key={graph._id}>
+                    <div className="flex justify-between items-center px-2">
+                      <div className="text-sm">{graph.title}</div>
+                      <div className="flex gap-2">
+                        <MdDelete
+                          className="cursor-pointer text-xl text-red-500"
+                          onClick={() => {
+                            handleDelete(graph._id);
+                          }}
+                        />
+                        <IoMdDownload
+                          className="cursor-pointer text-xl"
+                          onClick={() => {
+                            handleDownload(graph._id);
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <Separator className="my-2" />
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+          <TabsContent value="public">Change your password here.</TabsContent>
+        </Tabs>
       </div>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
         <ReactFlow
@@ -268,13 +447,6 @@ const DnDFlow = () => {
                 className="bg-white text-black gap-2 hover:bg-white shadow"
                 onClick={handleTempSave}
               >
-                <div
-                  className={
-                    saved == true
-                      ? "w-2 h-2 bg-black hidden rounded-full"
-                      : "w-2 h-2 bg-black block rounded-full"
-                  }
-                ></div>
                 <FaRegSave className="text-xl" />
                 Save
               </Button>
@@ -287,6 +459,29 @@ const DnDFlow = () => {
                 <FaFileExport className="text-xl" />
                 Export as JSON
               </Button>
+            </div>
+            <div className="flex flex-row justify-center items-center">
+              <Dialog>
+                <DialogTrigger className="bg-white font-semibold py-[0.35rem] px-3 rounded-md text-black gap-2 hover:bg-white shadow flex flex-row justify-center items-center">
+                  <FaDatabase className="text-xl" />
+                  Save in DB
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>Enter Roadmap Details</DialogTitle>
+                  <Input
+                    type="name"
+                    placeholder="Roadmap Title"
+                    onChange={(e) => {
+                      setRoadmapName(e.target.value);
+                    }}
+                  />
+                  <DialogClose asChild>
+                    <Button type="submit" onClick={handleDBSave}>
+                      <span className="text-white">Save</span>
+                    </Button>
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           <div className="flex gap-4 px-4 py-2 absolute top-[10px] left-[750px] z-10">

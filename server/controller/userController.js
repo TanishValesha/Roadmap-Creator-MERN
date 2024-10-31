@@ -36,7 +36,9 @@ exports.loginUser = async (req, res) => {
       const token = jwt.sign({ id: user._id }, process.env.SECERET, {
         expiresIn: "1d",
       });
-      res.status(200).send({ message: "Login Successful", success: true });
+      res
+        .status(200)
+        .send({ message: "Login Successful", success: true, token });
     }
   } catch (error) {
     res.status(500).send({ message: "Error Occurred", success: false, error });
@@ -53,7 +55,7 @@ exports.getCurrentUser = async (req, res) => {
       res.status(200).send({
         message: "User Fetched",
         success: true,
-        data: { name: user.name, email: user.email },
+        data: { id: user._id, name: user.name, email: user.email },
       });
     }
   } catch (error) {
