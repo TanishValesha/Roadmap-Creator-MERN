@@ -11,11 +11,21 @@ exports.saveGraph = async (req, res) => {
   }
 };
 
-exports.getGraphs = async (req, res) => {
+exports.getPrivateGraphs = async (req, res) => {
   const { userId } = req.params;
 
   try {
     const graphs = await Graph.find({ userId });
+    res.status(201).json(graphs);
+  } catch (error) {
+    console.error("Error fetching data", error);
+    res.status(500).json({ message: "Failed to fetch graphs" });
+  }
+};
+
+exports.getPublicGraphs = async (req, res) => {
+  try {
+    const graphs = await Graph.find({ isPublic: true });
     res.status(201).json(graphs);
   } catch (error) {
     console.error("Error fetching data", error);

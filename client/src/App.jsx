@@ -17,7 +17,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import { FaDatabase } from "react-icons/fa";
 import { FaFileExport } from "react-icons/fa6";
 import { IoMdDownload } from "react-icons/io";
 import { IoReload } from "react-icons/io5";
+import { IoPerson } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
@@ -69,6 +71,9 @@ const DnDFlow = () => {
   const [roadmapName, setRoadmapName] = useState("");
 
   const [dbGraphs, setDbgraphs] = useState([]);
+  const [publicGraphs, setPublicGraphs] = useState([]);
+
+  const [isEnabled, setIsEnabled] = useState(false);
 
   const onNodeClick = (e, node) => {
     setEditValue(node.data.label);
@@ -204,7 +209,13 @@ const DnDFlow = () => {
     try {
       const response = await axios.post(
         `${baseURL}/api/chart/save`,
-        { data: fileData, title: roadmapName, userId: currentUser.id },
+        {
+          data: fileData,
+          title: roadmapName,
+          userId: currentUser.id,
+          username: currentUser.name,
+          isPublic: isEnabled,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -313,9 +324,8 @@ const DnDFlow = () => {
     return response.data.data;
   };
 
-  const getDBgraphs = async (userId) => {
+  const getPriavteDBgraphs = async (userId) => {
     const token = localStorage.getItem("token");
-    console.log(currentUser);
     try {
       const response = await axios.get(
         `${baseURL}/api/chart/graphs-db/${userId}`,
@@ -326,6 +336,21 @@ const DnDFlow = () => {
         }
       );
       setDbgraphs(response.data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Can't Load from DB");
+    }
+  };
+
+  const getPublicGraphs = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(`${baseURL}/api/chart/graphs-db`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setPublicGraphs(response.data);
     } catch (error) {
       console.log(error);
       toast.error("Can't Load from DB");
@@ -348,10 +373,11 @@ const DnDFlow = () => {
     const fetchData = async () => {
       const user = await getCurrentUser();
       if (user) {
-        await getDBgraphs(user.id);
+        await getPriavteDBgraphs(user.id);
       }
     };
     fetchData();
+    getPublicGraphs();
   }, []);
 
   return (
@@ -382,44 +408,94 @@ const DnDFlow = () => {
               <div className="p-3 flex flex-col">
                 <div className="flex justify-between">
                   <h4 className="mb-4 text-lg font-medium leading-none">
-                    Previously Saved Roadmaps
+                    My Roadmaps
                   </h4>
                   <IoReload
                     className="text-xl text-yellow-500 cursor-pointer"
                     onClick={async () => {
                       const user = await getCurrentUser();
                       if (user) {
-                        await getDBgraphs(user.id);
+                        await getPriavteDBgraphs(user.id);
                       }
                     }}
                   />
                 </div>
-                {dbGraphs.map((graph) => (
-                  <div key={graph._id}>
-                    <div className="flex justify-between items-center px-2">
-                      <div className="text-sm">{graph.title}</div>
-                      <div className="flex gap-2">
-                        <MdDelete
-                          className="cursor-pointer text-xl text-red-500"
-                          onClick={() => {
-                            handleDelete(graph._id);
-                          }}
-                        />
-                        <IoMdDownload
-                          className="cursor-pointer text-xl"
-                          onClick={() => {
-                            handleDownload(graph._id);
-                          }}
-                        />
+                {dbGraphs.length != 0 ? (
+                  dbGraphs.map((graph) => (
+                    <div key={graph._id}>
+                      <div className="flex justify-between items-center px-2">
+                        <div className="text-sm">{graph.title}</div>
+                        <div className="flex gap-2">
+                          <MdDelete
+                            className="cursor-pointer text-xl text-red-500"
+                            onClick={() => {
+                              handleDelete(graph._id);
+                            }}
+                          />
+                          <IoMdDownload
+                            className="cursor-pointer text-xl"
+                            onClick={() => {
+                              handleDownload(graph._id);
+                            }}
+                          />
+                        </div>
                       </div>
+                      <Separator className="my-2" />
                     </div>
-                    <Separator className="my-2" />
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p>Empty</p>
+                )}
               </div>
             </ScrollArea>
           </TabsContent>
-          <TabsContent value="public">Change your password here.</TabsContent>
+          <TabsContent value="public">
+            <ScrollArea className="rounded-md border">
+              <div className="p-3 flex flex-col">
+                <div className="flex justify-between">
+                  <h4 className="mb-4 text-lg font-medium leading-none">
+                    Publically Available Roadmaps
+                  </h4>
+                  <IoReload
+                    className="text-xl text-yellow-500 cursor-pointer"
+                    onClick={async () => {
+                      const user = await getCurrentUser();
+                      if (user) {
+                        await getPublicGraphs();
+                      }
+                    }}
+                  />
+                </div>
+                {publicGraphs.length != 0 ? (
+                  publicGraphs.map((graph) => (
+                    <div key={graph._id} className="flex flex-col gap-[2px]">
+                      <div className="flex justify-between items-center px-2">
+                        <div className="text-sm">{graph.title}</div>
+                        <div className="flex gap-2">
+                          <IoMdDownload
+                            className="cursor-pointer text-xl"
+                            onClick={() => {
+                              handleDownload(graph._id);
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div className="pl-1 flex justify-start items-center gap-1">
+                        <IoPerson className="text-sm" />
+                        <span>
+                          Owner:{" "}
+                          <span className="font-bold">{graph.username}</span>
+                        </span>
+                      </div>
+                      <Separator className="my-2" />
+                    </div>
+                  ))
+                ) : (
+                  <p>Empty</p>
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
         </Tabs>
       </div>
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -475,6 +551,13 @@ const DnDFlow = () => {
                       setRoadmapName(e.target.value);
                     }}
                   />
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={isEnabled}
+                      onCheckedChange={(value) => setIsEnabled(value)}
+                    />
+                    <Label htmlFor="public">Public</Label>
+                  </div>
                   <DialogClose asChild>
                     <Button type="submit" onClick={handleDBSave}>
                       <span className="text-white">Save</span>
