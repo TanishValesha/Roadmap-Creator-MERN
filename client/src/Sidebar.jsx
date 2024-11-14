@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
 import { MdDone } from "react-icons/md";
+import { IoReload } from "react-icons/io5";
 import {
   Dialog,
   DialogContent,
@@ -217,7 +218,7 @@ export default () => {
           <div className="p-4">
             <div className="flex flex-row items-start justify-between">
               <h4 className="mb-4 text-lg font-medium leading-none">Tasks</h4>
-              <div>
+              <div className="flex gap-2">
                 <Dialog>
                   <DialogTrigger className="bg-black p-1 rounded-full">
                     <IoAddOutline className="text-lg cursor-pointer text-white font-bold" />
@@ -232,7 +233,16 @@ export default () => {
                       }}
                     />
                     <DialogClose asChild>
-                      <Button type="submit" onClick={handleTaskSave}>
+                      <Button
+                        type="submit"
+                        onClick={async () => {
+                          handleTaskSave();
+                          const user = await getCurrentUser();
+                          if (user) {
+                            await getAllTasks(user.id);
+                          }
+                        }}
+                      >
                         <span className="text-white">Add Task</span>
                       </Button>
                     </DialogClose>
@@ -251,13 +261,21 @@ export default () => {
                           handleCheckboxChange(task._id, task.isCompleted)
                         }
                       />
-                      <CardTitle>{task.title}</CardTitle>
+                      <CardTitle
+                        className={task.isCompleted ? "line-through" : ""}
+                      >
+                        {task.title}
+                      </CardTitle>
                     </div>
                     <div className="flex flex-row items-center">
                       <MdDelete
                         className="cursor-pointer text-xl"
-                        onClick={() => {
+                        onClick={async () => {
                           handleDelete(task._id);
+                          const user = await getCurrentUser();
+                          if (user) {
+                            await getAllTasks(user.id);
+                          }
                         }}
                       />
                     </div>

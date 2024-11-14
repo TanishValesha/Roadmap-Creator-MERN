@@ -24,7 +24,7 @@ exports.getAllTasks = async (req, res) => {
 };
 
 exports.updateTaskStatus = async (req, res) => {
-  const taskId = req.params.id;
+  const { taskId } = req.params;
   try {
     const { isCompleted } = req.body;
     const updatedTask = await Task.findByIdAndUpdate(
@@ -35,6 +35,7 @@ exports.updateTaskStatus = async (req, res) => {
     if (!updatedTask) {
       res.status(404).json({ error: "Task not found" });
     }
+    res.json(updatedTask);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }

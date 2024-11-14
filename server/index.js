@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    methods: ["GET", "POST", "PUT", "DELETE"], // Add PUT to allowed methods
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 app.use(express.json());

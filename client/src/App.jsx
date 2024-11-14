@@ -414,15 +414,6 @@ const DnDFlow = () => {
                   <h4 className="mb-4 text-lg font-medium leading-none">
                     My Roadmaps
                   </h4>
-                  <IoReload
-                    className="text-xl text-yellow-500 cursor-pointer"
-                    onClick={async () => {
-                      const user = await getCurrentUser();
-                      if (user) {
-                        await getPriavteDBgraphs(user.id);
-                      }
-                    }}
-                  />
                 </div>
                 {dbGraphs.length != 0 ? (
                   dbGraphs.map((graph) => (
@@ -432,8 +423,13 @@ const DnDFlow = () => {
                         <div className="flex gap-2">
                           <MdDelete
                             className="cursor-pointer text-xl text-red-500"
-                            onClick={() => {
+                            onClick={async () => {
                               handleDelete(graph._id);
+                              const user = await getCurrentUser();
+                              if (user) {
+                                await getPriavteDBgraphs(user.id);
+                                await getPublicGraphs();
+                              }
                             }}
                           />
                           <IoMdDownload
@@ -460,15 +456,6 @@ const DnDFlow = () => {
                   <h4 className="mb-4 text-lg font-medium leading-none">
                     Publically Available Roadmaps
                   </h4>
-                  <IoReload
-                    className="text-xl text-yellow-500 cursor-pointer"
-                    onClick={async () => {
-                      const user = await getCurrentUser();
-                      if (user) {
-                        await getPublicGraphs();
-                      }
-                    }}
-                  />
                 </div>
                 {publicGraphs.length != 0 ? (
                   publicGraphs.map((graph) => (
@@ -566,7 +553,17 @@ const DnDFlow = () => {
                     <Label htmlFor="public">Public</Label>
                   </div>
                   <DialogClose asChild>
-                    <Button type="submit" onClick={handleDBSave}>
+                    <Button
+                      type="submit"
+                      onClick={async () => {
+                        handleDBSave();
+                        const user = await getCurrentUser();
+                        if (user) {
+                          await getPriavteDBgraphs(user.id);
+                          await getPublicGraphs();
+                        }
+                      }}
+                    >
                       <span className="text-white">Save</span>
                     </Button>
                   </DialogClose>
