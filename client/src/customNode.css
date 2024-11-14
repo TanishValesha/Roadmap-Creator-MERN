@@ -1,0 +1,20 @@
+/* customNodeStyles.css */
+.custom-node {
+  padding: 10px;
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  background-color: #e3f2fd;
+  text-align: center;
+  width: 150px;
+}
+
+.custom-node-header {
+  font-size: 1.1em;
+  color: #333;
+  font-weight: bold;
+}
+
+.custom-node-body {
+  font-size: 0.9em;
+  color: #666;
+}

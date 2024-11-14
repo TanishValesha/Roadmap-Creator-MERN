@@ -30,6 +30,7 @@ import "./index.css";
 import { FaRegSave } from "react-icons/fa";
 import { FaDatabase } from "react-icons/fa";
 import { FaFileExport } from "react-icons/fa6";
+import { FaGlobeAmericas } from "react-icons/fa";
 import { IoMdDownload } from "react-icons/io";
 import { IoReload } from "react-icons/io5";
 import { IoPerson } from "react-icons/io5";
@@ -38,6 +39,7 @@ import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { baseURL } from "./utils/constants";
+import CustomNode from "./CustomNode";
 
 const initialNodes = [
   {
@@ -63,8 +65,6 @@ const DnDFlow = () => {
 
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
-
-  const [saved, setSaved] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -380,6 +380,10 @@ const DnDFlow = () => {
     getPublicGraphs();
   }, []);
 
+  const nodeTypes = {
+    customNode: CustomNode, // Register custom node
+  };
+
   return (
     <div className="dndflow">
       <div className="flex flex-col items-start bg-blue-500 w-[20%] h-[50%] p-6 gap-4 shadow-lg">
@@ -470,7 +474,10 @@ const DnDFlow = () => {
                   publicGraphs.map((graph) => (
                     <div key={graph._id} className="flex flex-col gap-[2px]">
                       <div className="flex justify-between items-center px-2">
-                        <div className="text-sm">{graph.title}</div>
+                        <div className="flex justify-start items-center gap-1">
+                          <FaGlobeAmericas />
+                          <div className="text-sm">{graph.title}</div>
+                        </div>
                         <div className="flex gap-2">
                           <IoMdDownload
                             className="cursor-pointer text-xl"
@@ -480,7 +487,7 @@ const DnDFlow = () => {
                           />
                         </div>
                       </div>
-                      <div className="pl-1 flex justify-start items-center gap-1">
+                      <div className="pl-2 flex justify-start items-center gap-1">
                         <IoPerson className="text-sm" />
                         <span>
                           Owner:{" "}

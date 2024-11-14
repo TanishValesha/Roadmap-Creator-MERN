@@ -26,7 +26,7 @@ const Login = () => {
           localStorage.setItem("token", response.data.token);
           setEmail("");
           setPassword("");
-          navigate("/");
+          navigate("/dashboard");
         } else {
           toast.error(response.data.message);
         }
