@@ -12,6 +12,8 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogClose,
   DialogTitle,
   DialogTrigger,
@@ -35,11 +37,14 @@ import { IoMdDownload } from "react-icons/io";
 import { IoReload } from "react-icons/io5";
 import { IoPerson } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
+import { IoLogOut } from "react-icons/io5";
+
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { baseURL } from "./utils/constants";
 import CustomNode from "./CustomNode";
+import { Navigate, redirect, useNavigate } from "react-router-dom";
 
 const initialNodes = [
   {
@@ -357,6 +362,13 @@ const DnDFlow = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.setItem("token", "");
+    localStorage.setItem("nodes", "");
+    localStorage.setItem("edges", "");
+    navigate("/");
+  };
+
   useEffect(() => {
     const savedNodes = localStorage.getItem("nodes");
     const savedEdges = localStorage.getItem("edges");
@@ -383,6 +395,8 @@ const DnDFlow = () => {
   const nodeTypes = {
     customNode: CustomNode, // Register custom node
   };
+
+  const navigate = useNavigate();
 
   return (
     <div className="dndflow">
@@ -566,6 +580,33 @@ const DnDFlow = () => {
                     >
                       <span className="text-white">Save</span>
                     </Button>
+                  </DialogClose>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="flex flex-row justify-center items-center">
+              <Dialog>
+                <DialogTrigger className="bg-white font-semibold py-[0.35rem] px-3 rounded-md text-black gap-2 hover:bg-white shadow flex flex-row justify-center items-center">
+                  <IoLogOut className="text-2xl" />
+                  Logout
+                </DialogTrigger>
+                <DialogContent className="max-w-[350px]">
+                  <DialogHeader>
+                    <DialogTitle>Are your sure you want logout ?</DialogTitle>
+                    <DialogDescription>
+                      Make sure you have saved your changes permanently on the
+                      DB.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogClose asChild>
+                    <div className=" mt-4 flex gap-6 justify-center">
+                      <Button type="submit" onClick={handleLogout}>
+                        <span className="text-white">Yes</span>
+                      </Button>
+                      <Button type="submit" onClick={() => {}}>
+                        <span className="text-white">No</span>
+                      </Button>
+                    </div>
                   </DialogClose>
                 </DialogContent>
               </Dialog>

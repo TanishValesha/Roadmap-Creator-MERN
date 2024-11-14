@@ -15,6 +15,10 @@ const Register = () => {
     e.preventDefault();
     if (name == "" || email == "" || password == "") {
       toast.error("All field are compulsory!");
+    } else if (name.length < 4) {
+      toast.error("Name should contain atleast 4 characters");
+    } else if (password.length < 8) {
+      toast.error("Password should be 8 or more characters long");
     } else {
       try {
         const response = await axios.post(`${baseURL}/api/user/register`, {
@@ -83,7 +87,7 @@ const Register = () => {
             </Button>
             <div>
               <p>Already have and account ?</p>
-              <Link to={"/login"} className="underline">
+              <Link to={"/"} className="underline">
                 Login Here
               </Link>
             </div>
