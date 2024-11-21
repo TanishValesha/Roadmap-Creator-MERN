@@ -63,6 +63,19 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      res.status(501).json({ message: "Email Already Taken" });
+    } else {
+      res.status(200).json({ message: "Email Not Already Taken" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Error Occurred", success: false, error });
+  }
+};
+
 exports.logoutUser = async (req, res) => {
   try {
   } catch (error) {}
