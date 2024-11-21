@@ -20,35 +20,25 @@ const Register = () => {
     } else if (password.length < 8) {
       toast.error("Password should be 8 or more characters long");
     } else {
-      const userCheck = await axios.get(`${baseURL}/api/user/user-check`, {
-        email,
-      });
-      if (userCheck.status == 200) {
-        try {
-          const response = await axios.post(`${baseURL}/api/user/register`, {
-            name,
-            email,
-            password,
-          });
-          console.log(response);
+      try {
+        const response = await axios.post(`${baseURL}/api/user/register`, {
+          name,
+          email,
+          password,
+        });
+        console.log(response);
 
-          if (response.data.success) {
-            toast.success("User Registered!");
-            setName("");
-            setEmail("");
-            setPassword("");
-            navigate("/");
-          } else {
-            toast.error(response.data.message);
-          }
-        } catch (error) {
-          toast.error("Something Went Wrong");
+        if (response.data.success) {
+          toast.success("User Registered!");
           setName("");
           setEmail("");
           setPassword("");
+          navigate("/");
+        } else {
+          toast.error(response.data.message);
         }
-      } else if (userCheck.status == 501) {
-        toast.error("Email Already Taken");
+      } catch (error) {
+        toast.error("Something Went Wrong");
         setName("");
         setEmail("");
         setPassword("");
