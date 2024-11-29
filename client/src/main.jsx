@@ -6,6 +6,7 @@ import Register from "./pages/Register.jsx";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthPage from "./pages/AuthPage.jsx";
+import Landing from "./pages/Landing.jsx";
 
 createRoot(document.getElementById("root")).render(
   <div className="main-app">
@@ -14,8 +15,8 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         {/* <Route path="/" element={<App />} /> */}
         <Route index path="/dashboard" element={<App />} />
-        <Route index path="/" element={<AuthPage />} />
-        <Route path="/register" element={<Register />} />
+        <Route index path="/" element={<Landing />} />
+        <Route path="/auth" element={<AuthPage />} />
       </Routes>
     </BrowserRouter>
   </div>
