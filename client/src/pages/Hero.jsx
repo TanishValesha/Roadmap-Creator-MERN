@@ -38,8 +38,8 @@ export function Hero() {
       </div>
       <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 lg:mt-20">
         <img
-          className="h-34 w-full object-cover sm:h-72 md:h-96 lg:w-[90%] lg:h-[90%] rounded"
-          src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200"
+          className="h-34 w-full object-cover sm:h-72 md:h-96 lg:w-[80%] lg:h-[80%] rounded"
+          src="hero-image.png"
           alt="Team collaboration"
         />
       </div>

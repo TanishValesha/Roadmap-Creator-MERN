@@ -6,7 +6,7 @@ export function AuthLayout({ children, title, subtitle }) {
       {/* Left side - Branding */}
       <div className="w-full md:w-1/2 bg-primary p-8 flex flex-col justify-center items-center text-primary-foreground space-y-8">
         <div className="max-w-md text-center md:text-left">
-          <h1 className="text-4xl font-bold mb-4">RoadMap Builder</h1>
+          <h1 className="text-4xl font-bold mb-4">Mapper - RoadMap Builder</h1>
           <p className="text-lg opacity-90">
             Create and share beautiful roadmaps to guide others on their
             learning journey. Join our community of knowledge sharers today.
