@@ -38,7 +38,10 @@ import { IoReload } from "react-icons/io5";
 import { IoPerson } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { IoLogOut } from "react-icons/io5";
-
+import { CgNotes } from "react-icons/cg";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import AnimatedCircularProgressBar from "./components/ui/animated-circular-progress-bar";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
@@ -49,14 +52,7 @@ import VerticalConnects from "./nodes/VerticalConnects";
 import BottomConnect from "./nodes/BottomConnect";
 import TopConnect from "./nodes/TopConnect";
 
-const initialNodes = [
-  {
-    id: "1",
-    type: "input",
-    data: { label: "Root" },
-    position: { x: 250, y: 5 },
-  },
-];
+const initialNodes = [];
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -82,6 +78,8 @@ const DnDFlow = () => {
   const [publicGraphs, setPublicGraphs] = useState([]);
 
   const [isEnabled, setIsEnabled] = useState(false);
+
+  const [notes, setNotes] = useState();
 
   const onNodeClick = (e, node) => {
     setEditValue(node.data.label);
@@ -412,6 +410,19 @@ const DnDFlow = () => {
   };
 
   const navigate = useNavigate();
+  const totalNodes = nodes.length;
+  let checkedNodes = 0;
+  {
+    nodes.map((node) => {
+      if (node.checked == true) {
+        checkedNodes++;
+      }
+    });
+  }
+  let value = 0;
+  if (totalNodes != 0) {
+    value = Math.floor((checkedNodes / totalNodes) * 100);
+  }
 
   return (
     <div className="dndflow">
@@ -624,17 +635,42 @@ const DnDFlow = () => {
                   </DialogHeader>
                   <DialogClose asChild>
                     <div className=" mt-4 flex gap-6 justify-center">
-                      <Button type="submit" onClick={handleLogout}>
-                        <span className="text-white">Yes</span>
-                      </Button>
                       <Button type="submit" onClick={() => {}}>
                         <span className="text-white">No</span>
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="bg-transparent  hover:bg-transparent"
+                        onClick={handleLogout}
+                      >
+                        <span className="text-blue-600">Yes</span>
                       </Button>
                     </div>
                   </DialogClose>
                 </DialogContent>
               </Dialog>
             </div>
+          </div>
+          <div className="absolute left-16 bottom-6 z-10">
+            <Dialog>
+              <DialogTrigger className="bg-white font-semibold py-[0.35rem] px-3 rounded-md text-black gap-2 hover:bg-white shadow flex flex-row justify-center items-center">
+                <CgNotes className="text-xl" />
+                Notes
+              </DialogTrigger>
+              <DialogContent className="min-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>Notes</DialogTitle>
+                </DialogHeader>
+                <div className="min-h-[500px] pb-10">
+                  <ReactQuill
+                    className="inline"
+                    theme="snow"
+                    value={notes}
+                    onChange={setNotes}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           <div className="flex gap-4 px-4 py-2 absolute top-[10px] left-[750px] z-10">
             <div className="flex flex-row justify-center items-center">
@@ -647,6 +683,15 @@ const DnDFlow = () => {
                 />
               </div>
             </div>
+          </div>
+          <div className="absolute bottom-0 right-0 scale-75 z-10">
+            <AnimatedCircularProgressBar
+              max={100}
+              min={0}
+              value={value}
+              gaugePrimaryColor="#2563EB"
+              gaugeSecondaryColor="rgba(0, 0, 0, 0.1)"
+            />
           </div>
         </ReactFlow>
       </div>

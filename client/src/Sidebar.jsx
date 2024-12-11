@@ -213,7 +213,7 @@ export default () => {
       <div className="w-[100%]">
         <div className="mb-10 flex flex-col gap-1">
           <div className="flex gap-1 items-center">
-            <Label>Progress: {Math.round(completionPercentage)}%</Label>
+            <Label>Tasks Progress: {Math.round(completionPercentage)}%</Label>
             <div className="bg-green-500 rounded-full p-1">
               <MdDone className="text-lg text-white" />
             </div>
