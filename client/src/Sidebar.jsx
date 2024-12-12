@@ -169,6 +169,13 @@ export default () => {
             You can drag these nodes to the pane on the right.
           </div>
           <div className="flex flex-col space-y-3 mb-3">
+            {/* <div
+              className="text-center bg-transparen outline outline-2 outline-blue-600"
+              onDragStart={(event) => onDragStart(event, "allSideConnects")}
+              draggable
+            >
+              All Side Connects
+            </div> */}
             <div
               className="text-center bg-transparen outline outline-2 outline-blue-600"
               onDragStart={(event) => onDragStart(event, "horizontalConnects")}

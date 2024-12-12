@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const userRouter = require("./routers/userRoute");
 const chartRouter = require("./routers/chartRouter");
 const taskRouter = require("./routers/taskRouter");
+const noteRouter = require("./routers/noteRouter");
 require("dotenv").config();
 const app = express();
 const path = require("path");
@@ -21,6 +22,7 @@ app.use(morgan("tiny"));
 app.use("/api/user", userRouter);
 app.use("/api/chart", chartRouter);
 app.use("/api/tasks", taskRouter);
+app.use("/api/notes", noteRouter);
 
 // app.use(express.static(path.join(__dirname, "/client/dist")));
 // app.get("*", (req, res) =>

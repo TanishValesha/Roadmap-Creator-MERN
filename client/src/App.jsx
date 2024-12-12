@@ -51,6 +51,7 @@ import { Navigate, redirect, useNavigate } from "react-router-dom";
 import VerticalConnects from "./nodes/VerticalConnects";
 import BottomConnect from "./nodes/BottomConnect";
 import TopConnect from "./nodes/TopConnect";
+import AllSideConnects from "./nodes/AllSideConnects";
 
 const initialNodes = [];
 
@@ -372,6 +373,90 @@ const DnDFlow = () => {
     }
   };
 
+  const handleExistingNote = async () => {
+    const token = localStorage.getItem("token");
+    const user = await getCurrentUser();
+    try {
+      const response = await axios.get(
+        `${baseURL}/api/notes/get-note/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const existingNote = response.data;
+      if (existingNote.length != 0) {
+        setNotes(existingNote[0].content);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Unexpected Error!");
+    }
+  };
+
+  const handleNotes = async () => {
+    const token = localStorage.getItem("token");
+    const user = await getCurrentUser();
+    let existingNote = null;
+    try {
+      const response = await axios.get(
+        `${baseURL}/api/notes/get-note/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      existingNote = response.data;
+      console.log(existingNote);
+      if (existingNote.length === 0) {
+        try {
+          const response = await axios.post(
+            `${baseURL}/api/notes/save-note`,
+            {
+              content: notes,
+              isGlobal: true,
+              userId: user.id,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          toast.success("Notes Saved");
+        } catch (error) {
+          console.log(error);
+          toast.error("Unexpected Error!");
+        }
+      } else {
+        try {
+          console.log(notes);
+          const response = await axios.put(
+            `${baseURL}/api/notes/update-note/${existingNote[0]._id}`,
+            notes,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          console.log(response);
+          toast.success("Notes Updated!");
+        } catch (error) {
+          console.log(error);
+          toast.error("Unexpected Error!");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Unexpected Error!");
+    }
+
+    //
+  };
+
   const handleLogout = () => {
     localStorage.setItem("token", "");
     localStorage.setItem("nodes", "");
@@ -403,6 +488,7 @@ const DnDFlow = () => {
   }, []);
 
   const nodeTypes = {
+    allSideConnects: AllSideConnects,
     horizontalConnects: HorizontalConnects,
     verticalConnects: VerticalConnects,
     topConnect: TopConnect,
@@ -653,7 +739,10 @@ const DnDFlow = () => {
           </div>
           <div className="absolute left-16 bottom-6 z-10">
             <Dialog>
-              <DialogTrigger className="bg-white font-semibold py-[0.35rem] px-3 rounded-md text-black gap-2 hover:bg-white shadow flex flex-row justify-center items-center">
+              <DialogTrigger
+                onClick={handleExistingNote}
+                className="bg-white font-semibold py-[0.35rem] px-3 rounded-md text-black gap-2 hover:bg-white shadow flex flex-row justify-center items-center"
+              >
                 <CgNotes className="text-xl" />
                 Notes
               </DialogTrigger>
@@ -669,6 +758,7 @@ const DnDFlow = () => {
                     onChange={setNotes}
                   />
                 </div>
+                <Button onClick={handleNotes}>Save</Button>
               </DialogContent>
             </Dialog>
           </div>
