@@ -1,6 +1,13 @@
 import React from "react";
 import { Handle, Position } from "@xyflow/react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { Button } from "@/components/ui/button";
 
 const BottomConnect = ({ id, data }) => {
   const handleCheckboxChange = (checked) => {

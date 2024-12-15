@@ -52,6 +52,7 @@ import VerticalConnects from "./nodes/VerticalConnects";
 import BottomConnect from "./nodes/BottomConnect";
 import TopConnect from "./nodes/TopConnect";
 import AllSideConnects from "./nodes/AllSideConnects";
+import IconPicker from "./pages/IconPicker";
 
 const initialNodes = [];
 
@@ -783,6 +784,7 @@ const DnDFlow = () => {
               gaugeSecondaryColor="rgba(0, 0, 0, 0.1)"
             />
           </div>
+          {/* <IconPicker className="z-10" /> */}
         </ReactFlow>
       </div>
       <Sidebar />
