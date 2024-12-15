@@ -47,7 +47,6 @@ exports.loginUser = async (req, res) => {
 
 exports.getCurrentUser = async (req, res) => {
   try {
-    console.log(req.body.userId);
     const user = await User.findOne({ _id: req.body.userId });
     if (!user) {
       res.status(404).send({ message: "User Not Found", success: false });

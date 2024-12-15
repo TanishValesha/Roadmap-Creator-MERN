@@ -13,7 +13,6 @@ exports.saveNote = async (req, res) => {
 
 exports.getNote = async (req, res) => {
   const { userId } = req.params;
-
   try {
     const note = await Note.find({ userId });
     res.status(201).json(note);
@@ -25,11 +24,15 @@ exports.getNote = async (req, res) => {
 
 exports.updateNote = async (req, res) => {
   const { noteId } = req.params;
-  console.log(req.body);
+  const content = req.body.notes;
   try {
-    const updatedNote = await Note.findByIdAndUpdate(noteId, req.body, {
-      new: true,
-    });
+    const updatedNote = await Note.findByIdAndUpdate(
+      noteId,
+      { content: content },
+      {
+        new: true,
+      }
+    );
 
     res.status(201).send({ message: "Updated!", updatedNote, success: true });
     console.log("Data saved to MongoDB");

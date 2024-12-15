@@ -1,4 +1,10 @@
-import React, { useRef, useCallback, useState, useEffect } from "react";
+import React, {
+  useRef,
+  useCallback,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -53,6 +59,9 @@ import BottomConnect from "./nodes/BottomConnect";
 import TopConnect from "./nodes/TopConnect";
 import AllSideConnects from "./nodes/AllSideConnects";
 import IconPicker from "./pages/IconPicker";
+import QuillToolbar from "./pages/EditorToolbar";
+import JoditEditor from "jodit-react";
+import { placeholder } from "jodit/esm/plugins/placeholder/placeholder";
 
 const initialNodes = [];
 
@@ -82,6 +91,14 @@ const DnDFlow = () => {
   const [isEnabled, setIsEnabled] = useState(false);
 
   const [notes, setNotes] = useState();
+
+  const editor = useRef(null);
+
+  const config = {
+    height: 300,
+    readOnly: false,
+    placeholder: "Start Typing.....",
+  };
 
   const onNodeClick = (e, node) => {
     setEditValue(node.data.label);
@@ -436,7 +453,7 @@ const DnDFlow = () => {
           console.log(notes);
           const response = await axios.put(
             `${baseURL}/api/notes/update-note/${existingNote[0]._id}`,
-            notes,
+            { notes },
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -747,16 +764,19 @@ const DnDFlow = () => {
                 <CgNotes className="text-xl" />
                 Notes
               </DialogTrigger>
-              <DialogContent className="min-w-[500px]">
+              <DialogContent className="min-w-[1400px]">
                 <DialogHeader>
                   <DialogTitle>Notes</DialogTitle>
                 </DialogHeader>
                 <div className="min-h-[500px] pb-10">
-                  <ReactQuill
-                    className="inline"
-                    theme="snow"
+                  <JoditEditor
+                    className="z-10"
+                    ref={editor}
+                    config={config}
                     value={notes}
-                    onChange={setNotes}
+                    onChange={(newContent) => {
+                      setNotes(newContent);
+                    }}
                   />
                 </div>
                 <Button onClick={handleNotes}>Save</Button>
