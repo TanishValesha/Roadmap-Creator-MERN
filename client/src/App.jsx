@@ -62,6 +62,8 @@ import IconPicker from "./pages/IconPicker";
 import QuillToolbar from "./pages/EditorToolbar";
 import JoditEditor from "jodit-react";
 import { placeholder } from "jodit/esm/plugins/placeholder/placeholder";
+import { Editor } from "react-draft-wysiwyg";
+import "../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 const initialNodes = [];
 
@@ -769,15 +771,7 @@ const DnDFlow = () => {
                   <DialogTitle>Notes</DialogTitle>
                 </DialogHeader>
                 <div className="min-h-[500px] pb-10">
-                  <JoditEditor
-                    className="z-10"
-                    ref={editor}
-                    config={config}
-                    value={notes}
-                    onChange={(newContent) => {
-                      setNotes(newContent);
-                    }}
-                  />
+                  <ReactQuill theme="snow" value={notes} onChange={setNotes} />;
                 </div>
                 <Button onClick={handleNotes}>Save</Button>
               </DialogContent>
