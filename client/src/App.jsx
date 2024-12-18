@@ -1,10 +1,4 @@
-import React, {
-  useRef,
-  useCallback,
-  useState,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -40,7 +34,6 @@ import { FaDatabase } from "react-icons/fa";
 import { FaFileExport } from "react-icons/fa6";
 import { FaGlobeAmericas } from "react-icons/fa";
 import { IoMdDownload } from "react-icons/io";
-import { IoReload } from "react-icons/io5";
 import { IoPerson } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { IoLogOut } from "react-icons/io5";
@@ -53,17 +46,11 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { baseURL } from "./utils/constants";
 import HorizontalConnects from "./nodes/HorizontalConnects";
-import { Navigate, redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import VerticalConnects from "./nodes/VerticalConnects";
 import BottomConnect from "./nodes/BottomConnect";
 import TopConnect from "./nodes/TopConnect";
 import AllSideConnects from "./nodes/AllSideConnects";
-import IconPicker from "./pages/IconPicker";
-import QuillToolbar from "./pages/EditorToolbar";
-import JoditEditor from "jodit-react";
-import { placeholder } from "jodit/esm/plugins/placeholder/placeholder";
-import { Editor } from "react-draft-wysiwyg";
-import "../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 const initialNodes = [];
 
@@ -770,9 +757,14 @@ const DnDFlow = () => {
                 <DialogHeader>
                   <DialogTitle>Notes</DialogTitle>
                 </DialogHeader>
-                <div className="min-h-[500px] pb-10">
-                  <ReactQuill theme="snow" value={notes} onChange={setNotes} />;
-                </div>
+                <ScrollArea className="pb-10">
+                  <ReactQuill
+                    className="h-96"
+                    theme="snow"
+                    value={notes}
+                    onChange={setNotes}
+                  />
+                </ScrollArea>
                 <Button onClick={handleNotes}>Save</Button>
               </DialogContent>
             </Dialog>
