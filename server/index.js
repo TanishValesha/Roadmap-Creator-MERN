@@ -24,10 +24,10 @@ app.use("/api/chart", chartRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/notes", noteRouter);
 
-// app.use(express.static(path.join(__dirname, "/client/dist")));
-// app.get("*", (req, res) =>
-//   res.sendFile(path.join(__dirname, "/client/dist/index.html"))
-// );
+app.use(express.static(path.join(__dirname, "/client/dist")));
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "/client/dist/index.html"))
+);
 
 try {
   mongoose.connect(process.env.MONGODB_CONNECTION_STRING).then(() => {
